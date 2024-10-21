@@ -13,10 +13,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ['id', 'project_name', 'client', 'users', 'created_at', 'created_by']
-
+    
+    def validate_users(self, value):
+        # Ensure that the users field contains a list of valid user IDs
+        if not all(isinstance(user_id, int) for user_id in value):
+            raise serializers.ValidationError("User IDs must be integers.")
+        return value
+    
 class ClientSerializer(serializers.ModelSerializer):
-    # projects = ProjectSerializer(many=True, read_only=True)
-    # created_by = serializers.ReadOnlyField(source='created_by.username')
     users = UserSerializer(many=True, read_only=True)
 
     class Meta:
